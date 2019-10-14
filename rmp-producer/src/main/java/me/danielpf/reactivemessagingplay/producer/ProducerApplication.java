@@ -35,7 +35,7 @@ public class ProducerApplication {
             product.setId(id);
             product.setName(RandomStringUtils.randomAlphanumeric(5, 10));
 
-            ProductEvent event = new ProductEvent();
+            final ProductEvent event = new ProductEvent();
             event.setId(UUID.randomUUID().toString());
             event.setProduct(product);
             if (id % 3 == 0) {

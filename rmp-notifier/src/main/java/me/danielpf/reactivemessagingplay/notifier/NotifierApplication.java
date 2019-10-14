@@ -1,5 +1,6 @@
 package me.danielpf.reactivemessagingplay.notifier;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.danielpf.reactivemessagingplay.common.domain.Constants;
 import me.danielpf.reactivemessagingplay.common.domain.Product;
@@ -50,22 +51,18 @@ public class NotifierApplication {
 
     @Service
     @Slf4j
+    @RequiredArgsConstructor
     public static class NotifyService {
+
         private final ReactiveRedisMessageListenerContainer container;
 
-        private final ReplayProcessor<ProductEvent> processor;
-
-        private final FluxSink<ProductEvent> sink;
-
-
-        public NotifyService(ReactiveRedisMessageListenerContainer container) {
-            this.container = container;
-            processor = ReplayProcessor.create();
-            sink = processor.sink();
-        }
+        private final ReplayProcessor<ProductEvent> processor = ReplayProcessor.create();
 
         @PostConstruct
         public void init() {
+
+            final FluxSink<ProductEvent> sink = processor.sink();
+
             container.receive(Arrays.asList(ChannelTopic.of(Constants.PRODUCT_EVENT_TOPIC)),
                               RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()),
                               RedisSerializationContext.SerializationPair.fromSerializer(new Jackson2JsonRedisSerializer<>(ProductEvent.class)))
